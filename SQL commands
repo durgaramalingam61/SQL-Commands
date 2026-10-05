@@ -1,0 +1,140 @@
+-- ONLINE FOOD ORDERING SYSTEM
+-- Database for 4 customers
+
+-- 1. CREATE DATABASE
+DROP DATABASE IF EXISTS food_ordering_project;
+CREATE DATABASE food_ordering_project;
+USE food_ordering_project;
+
+
+-- 2. CREATE FOOD ITEMS TABLE
+CREATE TABLE food_items (
+    food_id INT PRIMARY KEY,
+    food_name VARCHAR(100) NOT NULL,
+    category VARCHAR(50),
+    price DECIMAL(10,2) NOT NULL
+);
+
+
+-- 3. CREATE CUSTOMERS TABLE
+CREATE TABLE customers (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(15)
+);
+
+
+-- 4. CREATE ORDERS TABLE
+CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    order_status VARCHAR(30) DEFAULT 'Placed',
+    FOREIGN KEY (customer_id)
+        REFERENCES customers(customer_id)
+);
+
+
+-- 5. CREATE ORDER DETAILS TABLE
+CREATE TABLE order_details (
+    order_id INT,
+    food_id INT,
+    quantity INT NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (order_id, food_id),
+    FOREIGN KEY (order_id)
+        REFERENCES orders(order_id),
+    FOREIGN KEY (food_id)
+        REFERENCES food_items(food_id)
+);
+
+
+-- 6. INSERT FOOD ITEMS
+INSERT INTO food_items
+(food_id, food_name, category, price)
+VALUES
+(1, 'Chicken Burger', 'Fast Food', 149),
+(2, 'Margherita Pizza', 'Pizza', 199),
+(3, 'Peri Peri Fries', 'Fast Food', 99),
+(4, 'White Sauce Pasta', 'Italian', 179),
+(5, 'Paneer Tikka Roll', 'Rolls', 129),
+(6, 'Veg Momos', 'Chinese', 89),
+(7, 'Veg Biryani', 'Indian', 159),
+(8, 'Chicken Biryani', 'Indian', 219),
+(9, 'Chocolate Lava Cake', 'Dessert', 109),
+(10, 'Oreo Milkshake', 'Beverages', 119);
+
+
+-- 7. INSERT FOUR CUSTOMERS
+INSERT INTO customers (customer_name, phone)
+VALUES
+('Nandini', '9876543210'),
+('Rashmi', '9876543211'),
+('Durga', '9876543212'),
+('Atheena', '9876543213');
+
+
+-- 8. INSERT FOUR ORDERS
+INSERT INTO orders
+(customer_id, total_amount, order_status)
+VALUES
+(1, 248, 'Delivered'),
+(2, 308, 'Placed'),
+(3, 248, 'Preparing'),
+(4, 308, 'Delivered');
+
+
+-- 9. INSERT ORDER DETAILS
+INSERT INTO order_details
+(order_id, food_id, quantity, subtotal)
+VALUES
+-- Order 1: Chicken Burger + Peri Peri Fries
+(1, 1, 1, 149),
+(1, 3, 1, 99),
+
+-- Order 2: Margherita Pizza + Chocolate Lava Cake
+(2, 2, 1, 199),
+(2, 9, 1, 109),
+
+-- Order 3: Chicken Burger + Peri Peri Fries
+(3, 1, 1, 149),
+(3, 3, 1, 99),
+
+-- Order 4: Margherita Pizza + Chocolate Lava Cake
+(4, 2, 1, 199),
+(4, 9, 1, 109);
+
+
+-- 10. DISPLAY ALL FOOD ITEMS
+SELECT * FROM food_items;
+
+
+-- 11. DISPLAY ALL CUSTOMERS
+SELECT * FROM customers;
+
+
+-- 12. DISPLAY ALL ORDERS
+SELECT * FROM orders;
+
+
+-- 13. DISPLAY ALL ORDER DETAILS
+SELECT * FROM order_details;
+
+
+-- 14. DISPLAY COMPLETE ORDER INFORMATION
+SELECT
+    o.order_id,
+    c.customer_name,
+    f.food_name,
+    od.quantity,
+    od.subtotal,
+    o.total_amount,
+    o.order_status
+FROM orders o
+JOIN customers c
+    ON o.customer_id = c.customer_id
+JOIN order_details od
+    ON o.order_id = od.order_id
+JOIN food_items f
+    ON od.food_id = f.food_id
+ORDER BY o.order_id;
